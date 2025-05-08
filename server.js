@@ -12,23 +12,35 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Middlewares
 app.use(express.json());
-app.use(cors());
 app.use(cookieParser());
 
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
+
 app.use((req, res, next) => {
-    res.set("Cache-Control", "no-store");
-    next();
+  res.set("Cache-Control", "no-store");
+  next();
 });
 
+// Routes
 app.use("/api/users", userRoutes);
 app.use("/api/notes", noteRoutes);
+
+// Test route (optional)
+app.get("/", (req, res) => {
+  res.json({ message: "API is running 🚀" });
+});
+
+// ErrorHandler
 app.use(errorHandler);
 
-// app.get("/", (req, res) => res.json({ data: "Hello" }));
-
+// Connect DB & Start server
 connectDB(process.env.MONGODB_CONNECTION_STRING).then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT} ✅`);
-    });
+  app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT} ✅`);
+  });
 });
