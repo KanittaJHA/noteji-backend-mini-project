@@ -16,8 +16,24 @@ const PORT = process.env.PORT || 3001;
 app.use(express.json());
 app.use(cookieParser());
 
+// Allowed origins
+const allowedOrigins = [
+  process.env.CLIENT_URL_DEV,
+  process.env.CLIENT_URL_PROD,
+].map(origin => origin?.replace(/\/$/, ""));
+
+// CORS middleware
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: (origin, callback) => {
+    const cleanOrigin = origin?.replace(/\/$/, "");
+
+    if (!origin || allowedOrigins.includes(cleanOrigin)) {
+      callback(null, true);
+    } else {
+      console.error(`Blocked by CORS: ${origin}`);
+      callback(new Error(`CORS not allowed: ${origin}`));
+    }
+  },
   credentials: true,
 }));
 
@@ -32,7 +48,7 @@ app.use("/api/notes", noteRoutes);
 
 // Test route (optional)
 app.get("/", (req, res) => {
-  res.json({ message: "API is running 🚀" });
+  res.json({ message: "API is running ✅" });
 });
 
 // ErrorHandler
