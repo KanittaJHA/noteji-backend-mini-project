@@ -43,7 +43,7 @@ export const createAccount = async (req, res, next) => {
             .cookie("accessToken", token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
-                sameSite: "None",
+                sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
                 maxAge: 30 * 24 * 60 * 60 * 1000,
             })
             .json({
@@ -89,7 +89,7 @@ export const login = async (req, res, next) => {
             .cookie("accessToken", accessToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
-                sameSite: "None",
+                sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
                 maxAge: 30 * 24 * 60 * 60 * 1000,
             })
             .json({
@@ -126,7 +126,7 @@ export const getUser = async (req, res, next) => {
 export const logout = (req, res) => {
     res.clearCookie("accessToken", {
         httpOnly: true,
-        sameSite: "Strict",
+        sameSite: process.env.NODE_ENV === "production" ? "None" : "Strict",
         secure: process.env.NODE_ENV === "production"
     });
 
